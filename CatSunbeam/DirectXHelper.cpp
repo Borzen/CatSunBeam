@@ -1,5 +1,4 @@
 #include "DirectXHelper.h"
-
 // this function initializes and prepares Direct3D for use
 void DirectXHelper::initD3D(HWND hWnd, HINSTANCE hInstance)
 {
@@ -38,15 +37,27 @@ void DirectXHelper::initD3D(HWND hWnd, HINSTANCE hInstance)
 	RECT rect;
 	SetRect(&rect, 20, 20, SCREEN_WIDTH, 128);
 	
+	//tempary vectors untill rest implemented.
+	D3DXVECTOR3 s,m,m1;
+	s.x = 0.0f;
+	s.y = 4.0f;
+	s.z = 0.0f;
+	m.x = -3.0f;
+	m.y = 0.0f;
+	m.z = -3.0f;
+	m1.x = 3.0f;
+	m1.y = 5.0f;
+	m1.z = 3.0f;
+
 	camera = new Camera(d3ddev);
 	textbox = new Textbox(d3ddev, 48, rect);
 	input = new Input(d3ddev, camera, textbox);
-	p = new Particles();
+	p = new Particles(s,m,m1);
 	
 	input->initDInput(hInstance, hWnd);
 	
 	//p->initBuffer(v_buffer);
-	p->intBuffers(d3ddev);
+	p->intBuffers(d3ddev,0);
 	//p.set_particle(camera->xPosition,camera->yPosition,camera->zPosition,d3ddev);
 	//p.active = true;
 }
@@ -86,7 +97,6 @@ void DirectXHelper::renderFrame(void)
 
     d3ddev->EndScene();    // ends the 3D scene
 
-	p.run_particles(d3ddev);
 
     d3ddev->Present(NULL, NULL, NULL, NULL);   // displays the created frame on the screen
 }

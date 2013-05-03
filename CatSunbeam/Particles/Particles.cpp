@@ -7,6 +7,10 @@ float camx, camy, camz;    // camera position
 static const int PARTICLECOUNT = 50000;
 Particles particle[PARTICLECOUNT]; 
 
+D3DXVECTOR3 max;
+D3DXVECTOR3 min;
+D3DXVECTOR3 start;
+
 struct CUSTOMVERTEX1 {FLOAT X, Y, Z; DWORD COLOR; FLOAT U, V;};
 #define CUSTOMFVF (D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 struct GRIDVERTEX {D3DXVECTOR3 position; DWORD color;};
@@ -16,10 +20,16 @@ struct GRIDVERTEX {D3DXVECTOR3 position; DWORD color;};
 LPDIRECT3DTEXTURE9 texture;
 
 // function prototypes
-void run_particles(LPDIRECT3DDEVICE9);
 float random_number(float low, float high);
 
 Particles::Particles(){
+
+}
+
+Particles::Particles(D3DXVECTOR3 starting,D3DXVECTOR3 mi, D3DXVECTOR3 ma){
+	start = starting;
+	min = mi;
+	max = ma;
 	reset_particle();
 
 }
@@ -29,10 +39,11 @@ void Particles::initBuffer(LPDIRECT3DVERTEXBUFFER9 v_buffer)
 	t_buffer = v_buffer;
 }
 
-void Particles::intBuffers(LPDIRECT3DDEVICE9 d3ddev){
+void Particles::intBuffers(LPDIRECT3DDEVICE9 d3ddev, int vert){
 	D3DXCreateTextureFromFile(d3ddev,"dust.png",&texture);
 
-    struct CUSTOMVERTEX1 t_vert[] =
+
+		    struct CUSTOMVERTEX1 t_vert[] =
     {
         {-.05f, .05f, 0.0f, D3DCOLOR_XRGB(255, 255, 255), 1, 0,},
         {-0.05f, -.05f, 0.0f, D3DCOLOR_XRGB(255, 255, 255), 0, 0,},
@@ -54,6 +65,7 @@ void Particles::intBuffers(LPDIRECT3DDEVICE9 d3ddev){
     t_buffer->Lock(0, 0, (void**)&pVoid, 0);
     memcpy(pVoid, t_vert, sizeof(t_vert));
     t_buffer->Unlock();
+
 }
 
 // this is the function that positions, rotates, scales and renders the particle
@@ -116,6 +128,7 @@ void Particles::render_particle(LPDIRECT3DDEVICE9 d3ddev)
 // this function updates the particle
 void Particles::run_particle(float seconds)
 {
+
     // handle lifespan
     life += seconds;
     if(life > lifespan)
@@ -127,6 +140,9 @@ void Particles::run_particle(float seconds)
     velocity += acceleration * seconds;
     position += velocity * seconds;
 
+	if((position.y <= min.y || position.y > max.y) || (position.x <= min.x || position.x > max.x)||(position.z <= min.z || position.z > max.z)){
+		reset_particle();
+	}
     return;
 }
 
@@ -134,9 +150,9 @@ void Particles::run_particle(float seconds)
 void Particles::reset_particle()
 {
     active = false;
-    position.x = 0.0f;
-    position.y = 4.0f;
-    position.z = 0.0f;
+	position.x = start.x;
+	position.y = start.y;
+	position.z = start.z;
     velocity.x = random_number(-2.0f, 2.0f);
     velocity.y = -.25f;
     velocity.z = random_number(-2.0f, 2.0f);
