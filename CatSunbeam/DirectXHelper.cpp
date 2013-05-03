@@ -71,10 +71,11 @@ void DirectXHelper::renderFrame(void)
     d3ddev->SetStreamSource(0, v_buffer, 0, sizeof(CUSTOMVERTEX));
     // do 3D rendering on the back buffer here
 	// copy the vertex buffer to the back buffer
-	p.run_particles(d3ddev);
     d3ddev->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
 
     d3ddev->EndScene();    // ends the 3D scene
+
+	p.run_particles(d3ddev);
 
     d3ddev->Present(NULL, NULL, NULL, NULL);   // displays the created frame on the screen
 }

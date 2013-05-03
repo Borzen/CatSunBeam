@@ -104,6 +104,8 @@ void Particles::render_particle(LPDIRECT3DDEVICE9 d3ddev)
 
     d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 1);
 
+	d3ddev->EndScene();
+
     return;
 }
 
