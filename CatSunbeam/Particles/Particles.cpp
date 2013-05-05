@@ -43,7 +43,7 @@ void Particles::intBuffers(LPDIRECT3DDEVICE9 d3ddev, int vert){
 	D3DXCreateTextureFromFile(d3ddev,"dust.png",&texture);
 
 
-		    struct CUSTOMVERTEX1 t_vert[] =
+	struct CUSTOMVERTEX1 t_vert[] =
     {
         {-.05f, .05f, 0.0f, D3DCOLOR_XRGB(255, 255, 255), 1, 0,},
         {-0.05f, -.05f, 0.0f, D3DCOLOR_XRGB(255, 255, 255), 0, 0,},
