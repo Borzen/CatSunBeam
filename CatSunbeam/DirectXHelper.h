@@ -29,9 +29,10 @@ private:
 
     // ADDITIONS BY ZACK
     Model *mesh;
+    Model *cat;
     // END ADDITIONS BY ZACK
 
-	Camera* camera;
+	CCamera* camera;
 	Input* input;
 	Textbox* textbox;
 	Particles* p;
