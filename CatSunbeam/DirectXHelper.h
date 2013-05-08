@@ -8,6 +8,10 @@
 #include "Textbox/Textbox.h"
 #include "Particles/Particles.h";
 
+//ADDED BY ZACK
+#include "Model/Model.h"
+// END ADDED BY ZACK
+
 class DirectXHelper
 {
 public:
@@ -23,10 +27,15 @@ private:
 	LPDIRECT3DDEVICE9 d3ddev; // the pointer to the device class
 	LPDIRECT3DVERTEXBUFFER9 v_buffer;    // the pointer to the vertex buffer
 
+    // ADDITIONS BY ZACK
+    Model *mesh;
+    // END ADDITIONS BY ZACK
+
 	Camera* camera;
 	Input* input;
 	Textbox* textbox;
 	Particles* p;
+	Helper* helper;
 
 	float newYAngle;
 	float xPosition;

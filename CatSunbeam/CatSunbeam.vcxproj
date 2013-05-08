@@ -90,6 +90,19 @@
     <ClInclude Include="Scene/Scene.h" />
     <ClInclude Include="Textbox\Textbox.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="cage.png" />
+    <Image Include="carpet.png" />
+    <Image Include="catTexture.png" />
+    <Image Include="stucco.png" />
+    <Image Include="Tiny_skin.dds" />
+    <Image Include="wood.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cat.x" />
+    <None Include="CatSunBeam16.x" />
+    <None Include="tiny.x" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
