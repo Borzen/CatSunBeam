@@ -31,7 +31,30 @@ void DirectXHelper::initD3D(HWND hWnd, HINSTANCE hInstance)
 	
 	//tempary vectors untill rest implemented.
 	camera = new CCamera();
-	D3DXVECTOR3 s,m,m1;
+	D3DXVECTOR3 s,m,m1,v,a;
+	s.x = 0.0f;
+	s.y = 3.0f;
+	s.z = 3.0f;
+	m.x = -3.0f;
+	m.y = 0.0f;
+	m.z = -3.0f;
+	m1.x = 6.0f;
+	m1.y = 5.0f;
+	m1.z = 3.0f;
+	v.x = -1.0f;
+	v.y =  -.25f;
+	v.z = -1.0f;
+	a.x = 0.0f;
+	a.y = .05f;
+	a.z = 0.0f;
+
+	textbox = new Textbox(d3ddev, 48, rect);
+	input = new Input(d3ddev, camera, textbox);
+	p = new Particles(s,m,m1,v,a);
+	helper = new Helper();
+	input->initDInput(hInstance, hWnd);
+	p->intBuffers(d3ddev);
+
 	s.x = 0.0f;
 	s.y = 4.0f;
 	s.z = 0.0f;
@@ -41,17 +64,15 @@ void DirectXHelper::initD3D(HWND hWnd, HINSTANCE hInstance)
 	m1.x = 3.0f;
 	m1.y = 5.0f;
 	m1.z = 3.0f;
+	v.x = 0;
+	v.y = 0;
+	v.z = 0;
+	a.x = 0.0f;
+	a.y = .05f;
+	a.z = 0.0f;
 
-	textbox = new Textbox(d3ddev, 48, rect);
-	input = new Input(d3ddev, camera, textbox);
-	p = new Particles(s,m,m1);
-	helper = new Helper();
-	input->initDInput(hInstance, hWnd);
-	
-	//p->initBuffer(v_buffer);
-	p->intBuffers(d3ddev,0);
-	//p.set_particle(camera->xPosition,camera->yPosition,camera->zPosition,d3ddev);
-	//p.active = true;
+	flame = new Particles(s,m,m1,v,a);
+	flame->intFlame(d3ddev);
 }
 
 
@@ -89,7 +110,8 @@ void DirectXHelper::renderFrame(void)
 
 	//d3ddev->SetTransform(D3DTS_WORLD, &(matScale * matTranslate));
     //d3ddev->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
-	p->run_particles(d3ddev);
+	p->run_particles(d3ddev,0);
+	//flame->run_particles(d3ddev,1);
 
     // ADDED BY ZACK
     mesh->Render(helper->GetTime(), 0);
@@ -112,7 +134,7 @@ void DirectXHelper::cleanD3D(void)
 	delete camera;
 	delete input;
 	delete textbox;
-	delete p;
+	delete p,flame;
 }
 
 void ::DirectXHelper::init_graphics(void)

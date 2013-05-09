@@ -36,6 +36,7 @@ private:
 	Input* input;
 	Textbox* textbox;
 	Particles* p;
+	Particles* flame;
 	Helper* helper;
 
 	float newYAngle;

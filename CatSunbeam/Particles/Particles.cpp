@@ -1,6 +1,8 @@
 #include "Particles.h"
 
-LPDIRECT3DVERTEXBUFFER9 t_buffer = NULL;    // the pointer to the particle's vertex buffer
+LPDIRECT3DVERTEXBUFFER9 t_buffer = NULL;
+LPDIRECT3DVERTEXBUFFER9 f_buffer = NULL;
+// the pointer to the particle's vertex buffer
 LPDIRECT3DVERTEXBUFFER9 g_buffer = NULL;    // the pointer to the grid's vertex buffer
 float camx, camy, camz;    // camera position
 // PARTICLE particle;
@@ -10,14 +12,18 @@ Particles particle[PARTICLECOUNT];
 D3DXVECTOR3 max;
 D3DXVECTOR3 min;
 D3DXVECTOR3 start;
+D3DXVECTOR3 startV;
+D3DXVECTOR3 startA;
 
 struct CUSTOMVERTEX1 {FLOAT X, Y, Z; DWORD COLOR; FLOAT U, V;};
+struct CUSTOMVERTEX2 {FLOAT X, Y, Z; DWORD COLOR; FLOAT U, V;};
 #define CUSTOMFVF (D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 struct GRIDVERTEX {D3DXVECTOR3 position; DWORD color;};
 #define GRIDFVF (D3DFVF_XYZ | D3DFVF_DIFFUSE)
 
 // texture declarations
 LPDIRECT3DTEXTURE9 texture;
+LPDIRECT3DTEXTURE9 texture1;
 
 // function prototypes
 float random_number(float low, float high);
@@ -26,26 +32,51 @@ Particles::Particles(){
 
 }
 
-Particles::Particles(D3DXVECTOR3 starting,D3DXVECTOR3 mi, D3DXVECTOR3 ma){
+Particles::Particles(D3DXVECTOR3 starting,D3DXVECTOR3 mi, D3DXVECTOR3 ma,D3DXVECTOR3 v, D3DXVECTOR3 a){
 	start = starting;
 	min = mi;
 	max = ma;
+	startV = v;
+	startA = a;
 	reset_particle();
 
 }
 
-void Particles::initBuffer(LPDIRECT3DVERTEXBUFFER9 v_buffer)
-{
-	t_buffer = v_buffer;
+
+void Particles::intFlame(LPDIRECT3DDEVICE9 d3ddev){
+	D3DXCreateTextureFromFile(d3ddev,"fire.png",&texture1);
+
+	struct CUSTOMVERTEX2 f_vert[] =
+    {
+		{-.05f, .05f, 0.0f, D3DCOLOR_XRGB(255, 0, 0), 1, 0,},
+        {-0.05f, -.05f, 0.0f, D3DCOLOR_XRGB(255, 0, 0), 0, 0,},
+        {.05f, .05f, 0.0f, D3DCOLOR_XRGB(255, 0, 0), 1, 1,},
+        {.05f, -.05f, 0.0f, D3DCOLOR_XRGB(255, 0, 0), 0, 1,},
+    };
+
+    // create a vertex buffer interface called t_buffer
+    d3ddev->CreateVertexBuffer(4*sizeof(CUSTOMVERTEX2),
+                               0,
+                               CUSTOMFVF,
+                               D3DPOOL_MANAGED,
+							   &f_buffer,
+                               NULL);
+
+    VOID* pVoid;    // a void pointer
+
+    // lock t_buffer and load the vertices into it
+    f_buffer->Lock(0, 0, (void**)&pVoid, 0);
+	memcpy(pVoid, f_vert, sizeof(f_vert));
+    f_buffer->Unlock();
+
 }
 
-void Particles::intBuffers(LPDIRECT3DDEVICE9 d3ddev, int vert){
-	D3DXCreateTextureFromFile(d3ddev,"dust.png",&texture);
-
+void Particles::intBuffers(LPDIRECT3DDEVICE9 d3ddev){
+	D3DXCreateTextureFromFile(d3ddev,"white.png",&texture);
 
 	struct CUSTOMVERTEX1 t_vert[] =
     {
-        {-.05f, .05f, 0.0f, D3DCOLOR_XRGB(255, 255, 255), 1, 0,},
+		{-.05f, .05f, 0.0f, D3DCOLOR_XRGB(255, 255, 255), 1, 0,},
         {-0.05f, -.05f, 0.0f, D3DCOLOR_XRGB(255, 255, 255), 0, 0,},
         {.05f, .05f, 0.0f, D3DCOLOR_XRGB(255, 255, 255), 1, 1,},
         {.05f, -.05f, 0.0f, D3DCOLOR_XRGB(255, 255, 255), 0, 1,},
@@ -112,13 +143,19 @@ void Particles::set_particle(float camx, float camy, float camz, LPDIRECT3DDEVIC
 }
 
 // this function renders the particle
-void Particles::render_particle(LPDIRECT3DDEVICE9 d3ddev)
+void Particles::render_particle(LPDIRECT3DDEVICE9 d3ddev, int a)
 {
     //d3ddev->SetFVF(CUSTOMFVF);
-
-    d3ddev->SetStreamSource(0, t_buffer, 0, sizeof(CUSTOMVERTEX1));
-
-	d3ddev->SetTexture(0, texture);
+	if(a == 1){
+		d3ddev->SetStreamSource(0, f_buffer, 0, sizeof(CUSTOMVERTEX2));
+	}
+	else{
+		d3ddev->SetStreamSource(0, t_buffer, 0, sizeof(CUSTOMVERTEX1));
+	}
+	if(a == 1)
+	d3ddev->SetTexture(0, texture1);
+	else
+		d3ddev->SetTexture(0, texture);
 
     d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 1);
 
@@ -153,12 +190,12 @@ void Particles::reset_particle()
 	position.x = start.x;
 	position.y = start.y;
 	position.z = start.z;
-    velocity.x = random_number(-2.0f, 2.0f);
-    velocity.y = -.25f;
-    velocity.z = random_number(-2.0f, 2.0f);
-    acceleration.x = 0.0f;
-    acceleration.y = .05f;
-    acceleration.z = 0.0f;
+	velocity.x = startV.x;
+	velocity.y = startV.y;
+	velocity.z = startV.z;
+	acceleration.x = startA.x;
+	acceleration.y = startA.y;
+	acceleration.z = startA.z;
     radius = .5f;
     lifespan = 5.0f;
     life = 0.0f;
@@ -169,7 +206,7 @@ void Particles::reset_particle()
  
 
 // this function goes through and runs each active particle
-void Particles::run_particles(LPDIRECT3DDEVICE9 d3ddev)
+void Particles::run_particles(LPDIRECT3DDEVICE9 d3ddev, int a)
 {
     // calculate elapsed time
     static DWORD starting_point = GetTickCount(), time;
@@ -187,7 +224,7 @@ void Particles::run_particles(LPDIRECT3DDEVICE9 d3ddev)
         {
             particle[index].run_particle(time / 1000.0f);
             particle[index].set_particle(camx, camy, camz,d3ddev);
-            particle[index].render_particle(d3ddev);
+            particle[index].render_particle(d3ddev, a);
         }
     }
    // d3ddev->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);

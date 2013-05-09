@@ -14,14 +14,15 @@ class Particles
 {
 public:
 	Particles();
-	Particles(D3DXVECTOR3,D3DXVECTOR3,D3DXVECTOR3);
+	Particles(D3DXVECTOR3,D3DXVECTOR3,D3DXVECTOR3,D3DXVECTOR3,D3DXVECTOR3);
 
-    void render_particle(LPDIRECT3DDEVICE9);
+    void render_particle(LPDIRECT3DDEVICE9, int);
     void set_particle(float camx, float camy, float camz, LPDIRECT3DDEVICE9);
     void run_particle(float seconds);
     void reset_particle();
-	void intBuffers(LPDIRECT3DDEVICE9, int);
-	void run_particles(LPDIRECT3DDEVICE9);
+	void intBuffers(LPDIRECT3DDEVICE9);
+	void intFlame(LPDIRECT3DDEVICE9);
+	void run_particles(LPDIRECT3DDEVICE9, int);
 	void initBuffer(LPDIRECT3DVERTEXBUFFER9 v_buffer);
     bool active;
 
